@@ -1,0 +1,300 @@
+#########################################################################
+#
+# @par
+# This file is provided under a dual BSD/GPLv2 license.  When using or 
+#   redistributing this file, you may do so under either license.
+# 
+#   GPL LICENSE SUMMARY
+# 
+#   Copyright(c) 2007-2013 Intel Corporation. All rights reserved.
+# 
+#   This program is free software; you can redistribute it and/or modify 
+#   it under the terms of version 2 of the GNU General Public License as
+#   published by the Free Software Foundation.
+# 
+#   This program is distributed in the hope that it will be useful, but 
+#   WITHOUT ANY WARRANTY; without even the implied warranty of 
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+#   General Public License for more details.
+# 
+#   You should have received a copy of the GNU General Public License 
+#   along with this program; if not, write to the Free Software 
+#   Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
+#   The full GNU General Public License is included in this distribution 
+#   in the file called LICENSE.GPL.
+# 
+#   Contact Information:
+#   Intel Corporation
+# 
+#   BSD LICENSE 
+# 
+#   Copyright(c) 2007-2013 Intel Corporation. All rights reserved.
+#   All rights reserved.
+# 
+#   Redistribution and use in source and binary forms, with or without 
+#   modification, are permitted provided that the following conditions 
+#   are met:
+# 
+#     * Redistributions of source code must retain the above copyright 
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright 
+#       notice, this list of conditions and the following disclaimer in 
+#       the documentation and/or other materials provided with the 
+#       distribution.
+#     * Neither the name of Intel Corporation nor the names of its 
+#       contributors may be used to endorse or promote products derived 
+#       from this software without specific prior written permission.
+# 
+#   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+#   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+#   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+#   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+#   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+#   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
+#   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+#   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+#   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+#  version: QAT1.6.L.2.6.0-65
+#########################################################################
+#########################################################################
+#
+# This file is the configuration for a single dh895xcc_qa
+# device.
+#
+# Each device has 32 independent banks.
+#
+# - Each bank can contain up to 2 crypto and/or up to 2 data
+#   compression services.
+#
+# - The interrupt for each can be directed to a
+#   specific core.
+#
+#########################################################################
+
+##############################################
+# General Section
+##############################################
+
+[GENERAL]
+ServicesEnabled = cy;dc
+
+# Look Aside Cryptographic Configuration
+cyHmacAuthMode = 1
+
+# Wireless Enable/Disable, valid values: 1,0
+WirelessEnabled = 0
+
+# Firmware Location Configuration
+Firmware_MmpPath = dh895xcc/mmp_firmware.bin
+
+# Default values for number of concurrent requests
+CyNumConcurrentSymRequests = 512
+CyNumConcurrentAsymRequests = 64
+
+# Default number of DC concurrent requests.
+DcNumConcurrentRequests = 512
+
+#Statistics, valid values: 1,0
+statsGeneral = 1
+statsDc = 1
+statsDh = 1
+statsDrbg = 1
+statsDsa = 1
+statsEcc = 1
+statsKeyGen = 1
+statsLn = 1
+statsPrime = 1
+statsRsa = 1
+statsSym = 1
+
+# Debug feature, if set to 1 it enables additional entries in /proc filesystem
+ProcDebug = 1
+#####################################################################
+#
+# Hardware Access Bank Configuration
+# Each device has 32 banks (0-31)
+# If the OS supports MSI-X, each bank has an
+# steerable MSI-x interrupt which may be
+# affinitized to a particular core.
+#
+# There is only one logical accelerator:
+#   [Accelerator0]
+#
+# Items configurable per bank are:
+# - Interrupt Coalescing Enabled (MSI-x interrupts)
+# - The time in nano seconds before a coalesced interrupt is asserted
+# - The core to steer interrupts for this bank to
+# - Interrupt Coalescing based on the number of responses
+#
+# The format of the bank configurations are:
+#               Bank<n>InterruptCoalescingEnabled = "xxxx"
+#               Bank<n>InterruptCoalescingTimerNs = "xxxx"
+#               Bank<n>CoreIDAffinity = "xxxx"
+#               Bank<n>InterruptCoalescingNumResponses = "xxxx"
+#
+# Where:
+#       - n is the number of the bank starting at 0.
+#
+#####################################################################
+[Accelerator0]
+Bank0InterruptCoalescingEnabled = 1
+Bank0InterruptCoalescingTimerNs = 10000
+Bank0CoreIDAffinity = 0
+Bank0InterruptCoalescingNumResponses = 0
+
+#######################################################
+#
+# Logical Instances Section
+# A logical instance allows each address domain
+# (kernel space and individual user space processes)
+# to be allocated to a bank and to define the
+# behavior of that bank.
+# - N.B. A single bank cannot be shared between two
+#   address domains.
+#
+# The address domains are in the following format
+# - For kernel address domains
+#       [KERNEL]
+# - For user process address domains
+#   [xxxxx]
+#   Where xxxxx may be any ascii value which uniquely identifies
+#   the user mode process.
+#   To allow the driver correctly configure the
+#   logical instances associated with this user process,
+#   the process must call the icp_sal_userStart(...)
+#   passing the xxxxx string during process initialisation.
+#   When the user space process is finished it must call
+#   icp_sal_userStop(...) to free resources.
+#   If there are multiple devices present in the system all conf
+#   files that describe the devices must have the same address domain
+#   sections even if the address domain does not configure any instances
+#   on that particular device. So if icp_sal_userStart("xxxxx") is called
+#   then user process address domain [xxxxx] needs to be present in all
+#   conf files for all devices in the system.
+#
+# Items configurable by a logical instance are:
+# - Name of the logical instance
+# - The bank associated with this logical
+#   instance.
+# - The response mode associated wth this logical instance
+#   For instance in the kernel space :
+#       0 for IRQ
+#       1 for poll mode
+#   For instance in the user space :
+#       0 for IRQ (deprecated, please do not use it anymore)
+#       1 for poll mode
+#       2 for epoll mode (event based polling mode)
+# - The number of concurrent requests supported. Note this number
+#   affects the amount of memory allocated by the driver. Also
+#   Bank<n>InterruptCoalescingNumResponses is only supported for
+#   number of concurrent requests equal to 512.
+# - The Ring number. Rx ring number = Tx ring number + 8
+#
+# The format of the logical instances are:
+# - For crypto (Kernel space):
+#               Cy<n>Name = "xxxx"
+#               Cy<n>BankNumber = 0-31
+#               Cy<n>IsPolled = 0|1
+#               Cy<n>NumConcurrentSymRequests = 64|128|256|512|1024|2048|4096
+#               Cy<n>NumConcurrentAsymRequests = 64|128|256|512|1024|2048|4096
+#               Cy<n>RingAsymTx = 0|1
+#               Cy<n>RingAsymRx = 8|9
+#               Cy<n>RingSymTx = 2|3
+#               Cy<n>RingSymRx = 10|11
+#               Cy<n>RingNrbgTx = 4|5
+#               Cy<n>RingNrbgRx = 12|13
+#
+# - For Data Compression (Kernel space):
+#               Dc<n>Name = "xxxx"
+#               Dc<n>BankNumber = 0-31
+#               Dc<n>IsPolled = 0|1
+#               Dc<n>NumConcurrentRequests = 64|128|256|512|1024|2048|4096
+#               Dc<n>RingTx = 6|7
+#               Dc<n>RingRx = 14|15
+#
+# - For crypto (User space):
+#               Cy<n>Name = "xxxx"
+#               Cy<n>BankNumber = 0-31
+#               Cy<n>IsPolled = 1|2
+#               Cy<n>NumConcurrentSymRequests = 64|128|256|512|1024|2048|4096
+#               Cy<n>NumConcurrentAsymRequests = 64|128|256|512|1024|2048|4096
+#               Cy<n>RingAsymTx = 0|1
+#               Cy<n>RingAsymRx = 8|9
+#               Cy<n>RingSymTx = 2|3
+#               Cy<n>RingSymRx = 10|11
+#               Cy<n>RingNrbgTx = 4|5
+#               Cy<n>RingNrbgRx = 12|13
+#
+# - For Data Compression (User space):
+#               Dc<n>Name = "xxxx"
+#               Dc<n>BankNumber = 0-31
+#               Dc<n>IsPolled = 1|2
+#               Dc<n>NumConcurrentRequests = 64|128|256|512|1024|2048|4096
+#               Dc<n>RingTx = 6|7
+#               Dc<n>RingRx = 14|15
+#
+# Where:
+#       - n is the number of this logical instance starting at 0.
+#       - xxxx may be any ascii value which identifies the logical instance.
+#
+########################################################
+
+##############################################
+# Kernel Instances Section
+##############################################
+[KERNEL]
+NumberCyInstances = 1
+NumberDcInstances = 1
+
+# Crypto - Kernel instance #0
+Cy0Name = "IPSec0"
+Cy0BankNumber = 0
+Cy0IsPolled = 0
+Cy0NumConcurrentSymRequests = 512
+Cy0NumConcurrentAsymRequests = 64
+Cy0RingAsymTx = 1
+Cy0RingAsymRx = 9
+Cy0RingSymTx = 3
+Cy0RingSymRx = 11
+Cy0RingNrbgTx = 5
+Cy0RingNrbgRx = 13
+
+# Data Compression - Kernel instance #0
+Dc0Name = "IPComp0"
+Dc0IsPolled = 0
+Dc0NumConcurrentRequests = 512
+Dc0BankNumber = 0
+Dc0RingTx = 7
+Dc0RingRx = 15
+
+##############################################
+# User Process Instance Section
+##############################################
+[SSL]
+NumberCyInstances = 0
+NumberDcInstances = 0
+
+# Crypto - User instance #0
+Cy0Name = "SSL0"
+Cy0BankNumber = 0
+Cy0IsPolled = 1
+Cy0NumConcurrentSymRequests = 512
+Cy0NumConcurrentAsymRequests = 64
+Cy0RingAsymTx = 0
+Cy0RingAsymRx = 8
+Cy0RingSymTx = 2
+Cy0RingSymRx = 10
+Cy0RingNrbgTx = 4
+Cy0RingNrbgRx = 12
+
+# Data Compression - User instance #0
+Dc0Name = "UserDC0"
+Dc0BankNumber = 0
+Dc0IsPolled = 1
+Dc0NumConcurrentRequests = 512
+Dc0RingTx = 6
+Dc0RingRx = 14

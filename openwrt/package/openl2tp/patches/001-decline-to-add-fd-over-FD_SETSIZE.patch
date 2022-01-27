@@ -1,0 +1,45 @@
+From: julien <julien@meraki.com>
+Date: Sun, 5 Apr 2020 13:41:40 -0700
+Subject: openl2tp: decline to add fd over FD_SETSIZE to fd_set
+
+As per the headline, this commit changes the usl_fd_add_fd() function to
+decline adding an additional fd to the usl_fd_set when it reaches FD_SETSIZE,
+so as to avoid triggering an undefined behavior from select(). Without this
+change, we have observed select() returning EBADF, which causes openl2tpd to
+assume some of the fds in the fd_set may have been closed in between the fd_set
+being built, and being passed to select, and thus rebuilds the fd_set from the
+two list of active and idle fds it maintains. Unfortunately, when EBADF is
+returned because one of the fds was greater or equal to FD_SETSIZE, rebuilding
+the fd_set from the same set of fds will not change that condition, forcing
+open2ltpd into an infinite loop until all of the fds that are greater or equal
+to FD_SETSIZE are closed, which may never happen.
+
+The commit was tested by verifying that attempting to connect in excess of 506
+VPN clients, which results in the highest fd being over FD_SETSIZE (1024), does
+not result in openl2tpd entering said infinite loop and consuming all the CPU
+doing nothing.
+
+Change-Id: Iac1d3f83bc0ec4bdd5197fdb417f68f38cbb29cf
+---
+ usl/usl_fd.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/usl/usl_fd.c b/usl/usl_fd.c
+index 2c1e100799b..7a24d76a2a9 100644
+--- a/usl/usl_fd.c
++++ b/usl/usl_fd.c
+@@ -143,6 +143,11 @@ int usl_fd_add_fd(int fd, usl_fd_callback_fn_t callback, void *arg)
+ {
+ 	struct fd_entry *entry;
+ 
++	/* Check that we're not at select() max capacity already. */
++	if (fd >= FD_SETSIZE) {
++		return -EBADF;
++	}
++
+ 	/* Check that the fd isn't already registsred. */
+ 	entry = usl_fd_find(fd);
+ 	if (entry != NULL) {
+-- 
+2.26.0
+

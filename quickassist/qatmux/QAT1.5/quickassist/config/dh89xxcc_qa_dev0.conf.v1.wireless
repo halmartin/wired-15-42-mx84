@@ -1,0 +1,772 @@
+#########################################################################
+#
+# @par
+# This file is provided under a dual BSD/GPLv2 license.  When using or 
+#   redistributing this file, you may do so under either license.
+# 
+#   GPL LICENSE SUMMARY
+# 
+#   Copyright(c) 2007-2013 Intel Corporation. All rights reserved.
+# 
+#   This program is free software; you can redistribute it and/or modify 
+#   it under the terms of version 2 of the GNU General Public License as
+#   published by the Free Software Foundation.
+# 
+#   This program is distributed in the hope that it will be useful, but 
+#   WITHOUT ANY WARRANTY; without even the implied warranty of 
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+#   General Public License for more details.
+# 
+#   You should have received a copy of the GNU General Public License 
+#   along with this program; if not, write to the Free Software 
+#   Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
+#   The full GNU General Public License is included in this distribution 
+#   in the file called LICENSE.GPL.
+# 
+#   Contact Information:
+#   Intel Corporation
+# 
+#   BSD LICENSE 
+# 
+#   Copyright(c) 2007-2013 Intel Corporation. All rights reserved.
+#   All rights reserved.
+# 
+#   Redistribution and use in source and binary forms, with or without 
+#   modification, are permitted provided that the following conditions 
+#   are met:
+# 
+#     * Redistributions of source code must retain the above copyright 
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright 
+#       notice, this list of conditions and the following disclaimer in 
+#       the documentation and/or other materials provided with the 
+#       distribution.
+#     * Neither the name of Intel Corporation nor the names of its 
+#       contributors may be used to endorse or promote products derived 
+#       from this software without specific prior written permission.
+# 
+#   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+#   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+#   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+#   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+#   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+#   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
+#   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+#   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+#   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+#  version: QAT1.5.L.1.11.0-36
+#########################################################################
+########################################################
+#
+# This file is the configuration for a single dh89xxcc_qa
+# device.
+#
+# Each device has up to two accelerators.
+# - The client may load balance between these
+#   accelerators.
+# Each accelerator has 8 independent ring banks.
+# - The interrupt for each can be directed to a
+#   specific core.
+# Each ring bank as 16 rings (hardware assisted queues).
+#
+########################################################
+
+##############################################
+# General Section
+##############################################
+
+[GENERAL]
+ServicesEnabled = cy0;cy1
+
+# Look Aside Cryptographic Configuration
+cyHmacAuthMode = 1
+
+# Look Aside Compression Configuration
+dcTotalSRAMAvailable = 0
+
+#No wireless
+NumberOfWirelessProcs = 1
+
+# Firmware Location Configuration
+Firmware_MofPath = mof_firmware.bin
+Firmware_MmpPath = mmp_firmware.bin
+
+# QAT Parameters
+Accel0AdminBankNumber = 0
+Accel0AcceleratorNumber = 0
+Accel0AdminTx = 0
+Accel0AdminRx = 1
+
+Accel1AcceleratorNumber = 1
+Accel1AdminBankNumber = 0
+Accel1AdminTx = 0
+Accel1AdminRx = 1
+
+#Statistics, valid values: 1,0
+statsGeneral = 1
+statsDc = 1
+statsDh = 1
+statsDrbg = 1
+statsDsa = 1
+statsEcc = 1
+statsKeyGen = 1
+statsLn = 1
+statsPrime = 1
+statsRsa = 1
+statsSym = 1
+
+# Enables or disables Single Root Complex IO Virtualization.
+# If this is enabled (1) then SRIOV and VT-d need to be enabled in
+# BIOS and there can be no Cy or Dc instances created in PF (Dom0).
+# If this i disabled (0) then SRIOV and VT-d need to be disabled
+# in BIOS and Cy and/or Dc instances can be used in PF (Dom0)
+SRIOV_Enabled = 0
+
+#Debug feature, if set to 1 it enables additional entries in /proc filesystem
+ProcDebug = 1
+
+################################################
+#
+# Hardware Access Ring Bank Configuration
+# Each Accelerator has 8 ring banks (0-7)
+# If the OS supports MSI-X, each ring bank has an
+# steerable MSI-x interrupt which may be
+# affinitized to a particular node/core.
+#
+################################################
+
+
+[Accelerator0]
+Bank0InterruptCoalescingEnabled = 1
+Bank0InterruptCoalescingTimerNs = 10000
+Bank0CoreIDAffinity = 0
+Bank0InterruptCoalescingNumResponses = 0
+
+Bank1InterruptCoalescingEnabled = 1
+Bank1InterruptCoalescingTimerNs = 10000
+Bank1CoreIDAffinity = 2
+Bank1InterruptCoalescingNumResponses = 0
+
+Bank2InterruptCoalescingEnabled = 1
+Bank2InterruptCoalescingTimerNs = 10000
+Bank2CoreIDAffinity = 4
+Bank2InterruptCoalescingNumResponses = 0
+
+Bank3InterruptCoalescingEnabled = 1
+Bank3InterruptCoalescingTimerNs = 10000
+Bank3CoreIDAffinity = 6
+Bank3InterruptCoalescingNumResponses = 0
+
+Bank4InterruptCoalescingEnabled = 1
+Bank4InterruptCoalescingTimerNs = 10000
+Bank4CoreIDAffinity = 0
+Bank4InterruptCoalescingNumResponses = 0
+
+Bank5InterruptCoalescingEnabled = 1
+Bank5InterruptCoalescingTimerNs = 10000
+Bank5CoreIDAffinity = 2
+Bank5InterruptCoalescingNumResponses = 0
+
+Bank6InterruptCoalescingEnabled = 1
+Bank6InterruptCoalescingTimerNs = 10000
+Bank6CoreIDAffinity = 4
+Bank6InterruptCoalescingNumResponses = 0
+
+Bank7InterruptCoalescingEnabled = 1
+Bank7InterruptCoalescingTimerNs = 10000
+Bank7CoreIDAffinity = 6
+Bank7InterruptCoalescingNumResponses = 0
+
+[Accelerator1]
+Bank0InterruptCoalescingEnabled = 1
+Bank0InterruptCoalescingTimerNs = 10000
+Bank0CoreIDAffinity = 1
+Bank0InterruptCoalescingNumResponses = 0
+
+Bank1InterruptCoalescingEnabled = 1
+Bank1InterruptCoalescingTimerNs = 10000
+Bank1CoreIDAffinity = 3
+Bank1InterruptCoalescingNumResponses = 0
+
+Bank2InterruptCoalescingEnabled = 1
+Bank2InterruptCoalescingTimerNs = 10000
+Bank2CoreIDAffinity = 5
+Bank2InterruptCoalescingNumResponses = 0
+
+Bank3InterruptCoalescingEnabled = 1
+Bank3InterruptCoalescingTimerNs = 10000
+Bank3CoreIDAffinity = 7
+Bank3InterruptCoalescingNumResponses = 0
+
+Bank4InterruptCoalescingEnabled = 1
+Bank4InterruptCoalescingTimerNs = 10000
+Bank4CoreIDAffinity = 1
+Bank4InterruptCoalescingNumResponses = 0
+
+Bank5InterruptCoalescingEnabled = 1
+Bank5InterruptCoalescingTimerNs = 10000
+Bank5CoreIDAffinity = 3
+Bank5InterruptCoalescingNumResponses = 0
+
+Bank6InterruptCoalescingEnabled = 1
+Bank6InterruptCoalescingTimerNs = 10000
+Bank6CoreIDAffinity = 5
+Bank6InterruptCoalescingNumResponses = 0
+
+Bank7InterruptCoalescingEnabled = 1
+Bank7InterruptCoalescingTimerNs = 10000
+Bank7CoreIDAffinity = 7
+Bank7InterruptCoalescingNumResponses = 0
+
+#######################################################
+#
+# Logical Instances Section
+# A logical instance allows each address domain
+# (kernel space and individual user space processes)
+# to configure rings (i.e. hardware assisted queues)
+# to be used by that address domain and to define the
+# behavior of that ring.
+#
+# The address domains are in the following format
+# - For kernel address domains
+#       [KERNEL]
+# - For user process address domains
+#   [xxxxx]
+#   Where xxxxx may be any ascii value which uniquely identifies
+#   the user mode process.
+#   To allow the driver correctly configure the
+#   logical instances associated with this user process,
+#   the process must call the icp_sal_userStart(...)
+#   passing the xxxxx string during process initialisation.
+#   When the user space process is finish it must call
+#   icp_sal_userStop(...) to free resources.
+#   If there are multiple devices present in the system all conf
+#   files that describe the devices must have the same address domain
+#   sections even if the address domain does not configure any instances
+#   on that particular device. So if icp_sal_userStart("xxxxx") is called
+#   then user process address domain [xxxxx] needs to be present in all
+#   conf files for all devices in the system.
+#
+# Items configurable by a logical instance are:
+# - Name of the logical instance
+# - The accelerator associated with this logical
+#   instance
+# - The execution engine associated with this logical
+#   instance (For crypto instances only)
+# - The ring bank associated with this logical
+#   instance.
+# - The response mode associated wth this logical instance (0
+#   for IRQ or 1 for polled).
+# - The ring for receiving and the ring for transmitting.
+# - The number of concurrent requests supported by a pair of
+#   rings on this instance (tx + rx). Note this number affects
+#   the amount of memory allocated by the driver. Also
+#   Bank<n>InterruptCoalescingNumResponses is only supported for
+#   number of concurrent requests equal to 512.
+#
+# Note: Logical instances may not share the same ring, but
+#           may share a ring bank.
+#
+# The format of the logical instances are:
+# - For crypto:
+#               Cy<n>Name = "xxxx"
+#               Cy<n>AcceleratorNumber = 0|1
+#               Cy<n>ExecutionEngine = 0|1
+#               Cy<n>BankNumber = 0-7
+#               Cy<n>IsPolled = 0|1
+#               Cy<n>NumConcurrentSymRequests = 64|128|256|512|1024|2048|4096
+#               Cy<n>NumConcurrentAsymRequests = 64|128|256|512|1024|2048|4096
+#               Cy<n>RingAsymTx = 0-14 (Even numbers only)
+#               Cy<n>RingAsymRx = 1-15 (Odd numbers only)
+#               Cy<n>RingSymTxHi = 0-14 (Even numbers only)
+#               Cy<n>RingSymRxHi = 1-15 (Odd numbers only)
+#               Cy<n>RingSymTxLo = 0-14 (Even numbers only)
+#               Cy<n>RingSymRxLo = 1-15 (Odd numbers only)
+#
+# - For Data Compression
+#               Dc<n>Name = "xxxx"
+#               Dc<n>AcceleratorNumber = 0|1
+#               Dc<n>BankNumber = 0-7
+#               Dc<n>IsPolled = 0|1
+#               Dc<n>NumConcurrentRequests = 64|128|256|512|1024|2048|4096
+#               Dc<n>RingTx = 0-14 (Even numbers only)
+#               Dc<n>RingRx = 1-15 (Odd numbers only)
+#
+#
+# Where:
+#       - n is the number of this logical instance starting at 0.
+#       - xxxx may be any ascii value which identifies the logical instance.
+#
+########################################################
+
+##############################################
+# Kernel Instances Section
+##############################################
+[KERNEL]
+NumberCyInstances = 0
+NumberDcInstances = 0
+
+##############################################
+# User Process Instance Section
+##############################################
+
+[WIRELESS_INT_0]
+NumberCyInstances = 4
+NumberDcInstances = 0
+
+# Crypto - User instance #0
+Cy0Name = "WIRELESS0"
+Cy0AcceleratorNumber = 0
+Cy0ExecutionEngine = 0
+Cy0BankNumber = 0
+Cy0IsPolled = 1
+Cy0NumConcurrentSymRequests = 512
+Cy0NumConcurrentAsymRequests = 64
+Cy0RingAsymTx = 2
+Cy0RingAsymRx = 3
+Cy0RingSymTxHi = 4
+Cy0RingSymRxHi = 5
+Cy0RingSymTxLo = 6
+Cy0RingSymRxLo = 7
+
+# Crypto - User instance #1
+Cy1Name = "WIRELESS1"
+Cy1AcceleratorNumber = 0
+Cy1ExecutionEngine = 1
+Cy1BankNumber = 1
+Cy1IsPolled = 1
+Cy1NumConcurrentSymRequests = 512
+Cy1NumConcurrentAsymRequests = 64
+Cy1RingAsymTx = 2
+Cy1RingAsymRx = 3
+Cy1RingSymTxHi = 4
+Cy1RingSymRxHi = 5
+Cy1RingSymTxLo = 6
+Cy1RingSymRxLo = 7
+
+
+# Crypto - User instance #2
+Cy2Name = "WIRELESS2"
+Cy2AcceleratorNumber = 1
+Cy2ExecutionEngine = 0
+Cy2BankNumber = 0
+Cy2IsPolled = 1
+Cy2NumConcurrentSymRequests = 512
+Cy2NumConcurrentAsymRequests = 64
+Cy2RingAsymTx = 2
+Cy2RingAsymRx = 3
+Cy2RingSymTxHi = 4
+Cy2RingSymRxHi = 5
+Cy2RingSymTxLo = 6
+Cy2RingSymRxLo = 7
+
+# Crypto - User instance #3
+Cy3Name = "WIRELESS3"
+Cy3AcceleratorNumber = 1
+Cy3ExecutionEngine = 1
+Cy3BankNumber = 1
+Cy3IsPolled = 1
+Cy3NumConcurrentSymRequests = 512
+Cy3NumConcurrentAsymRequests = 64
+Cy3RingAsymTx = 2
+Cy3RingAsymRx = 3
+Cy3RingSymTxHi = 4
+Cy3RingSymRxHi = 5
+Cy3RingSymTxLo = 6
+Cy3RingSymRxLo = 7
+
+Cy4Name = "WIRELESS4"
+Cy4AcceleratorNumber = 0
+Cy4ExecutionEngine = 0
+Cy4BankNumber = 2
+Cy4IsPolled = 1
+Cy4NumConcurrentSymRequests = 512
+Cy4NumConcurrentAsymRequests = 64
+Cy4RingAsymTx = 2
+Cy4RingAsymRx = 3
+Cy4RingSymTxHi = 4
+Cy4RingSymRxHi = 5
+Cy4RingSymTxLo = 6
+Cy4RingSymRxLo = 7
+
+Cy5Name = "WIRELESS5"
+Cy5AcceleratorNumber = 0
+Cy5ExecutionEngine = 1
+Cy5BankNumber = 3
+Cy5IsPolled = 1
+Cy5NumConcurrentSymRequests = 512
+Cy5NumConcurrentAsymRequests = 64
+Cy5RingAsymTx = 2
+Cy5RingAsymRx = 3
+Cy5RingSymTxHi = 4
+Cy5RingSymRxHi = 5
+Cy5RingSymTxLo = 6
+Cy5RingSymRxLo = 7
+
+Cy6Name = "WIRELESS6"
+Cy6AcceleratorNumber = 1
+Cy6ExecutionEngine = 0
+Cy6BankNumber = 2
+Cy6IsPolled = 1
+Cy6NumConcurrentSymRequests = 512
+Cy6NumConcurrentAsymRequests = 64
+Cy6RingAsymTx = 2
+Cy6RingAsymRx = 3
+Cy6RingSymTxHi = 4
+Cy6RingSymRxHi = 5
+Cy6RingSymTxLo = 6
+Cy6RingSymRxLo = 7
+
+Cy7Name = "WIRELESS7"
+Cy7AcceleratorNumber = 1
+Cy7ExecutionEngine = 1
+Cy7BankNumber = 3
+Cy7IsPolled = 1
+Cy7NumConcurrentSymRequests = 512
+Cy7NumConcurrentAsymRequests = 64
+Cy7RingAsymTx = 2
+Cy7RingAsymRx = 3
+Cy7RingSymTxHi = 4
+Cy7RingSymRxHi = 5
+Cy7RingSymTxLo = 6
+Cy7RingSymRxLo = 7
+
+Cy8Name = "WIRELESS8"
+Cy8AcceleratorNumber = 0
+Cy8ExecutionEngine = 0
+Cy8BankNumber = 4
+Cy8IsPolled = 1
+Cy8NumConcurrentSymRequests = 512
+Cy8NumConcurrentAsymRequests = 64
+Cy8RingAsymTx = 2
+Cy8RingAsymRx = 3
+Cy8RingSymTxHi = 4
+Cy8RingSymRxHi = 5
+Cy8RingSymTxLo = 6
+Cy8RingSymRxLo = 7
+
+Cy9Name = "WIRELESS9"
+Cy9AcceleratorNumber = 0
+Cy9ExecutionEngine = 1
+Cy9BankNumber = 5
+Cy9IsPolled = 1
+Cy9NumConcurrentSymRequests = 512
+Cy9NumConcurrentAsymRequests = 64
+Cy9RingAsymTx = 2
+Cy9RingAsymRx = 3
+Cy9RingSymTxHi = 4
+Cy9RingSymRxHi = 5
+Cy9RingSymTxLo = 6
+Cy9RingSymRxLo = 7
+
+Cy10Name = "WIRELESS10"
+Cy10AcceleratorNumber = 1
+Cy10ExecutionEngine = 0
+Cy10BankNumber = 4
+Cy10IsPolled = 1
+Cy10NumConcurrentSymRequests = 512
+Cy10NumConcurrentAsymRequests = 64
+Cy10RingAsymTx = 2
+Cy10RingAsymRx = 3
+Cy10RingSymTxHi = 4
+Cy10RingSymRxHi = 5
+Cy10RingSymTxLo = 6
+Cy10RingSymRxLo = 7
+
+Cy11Name = "WIRELESS11"
+Cy11AcceleratorNumber = 1
+Cy11ExecutionEngine = 1
+Cy11BankNumber = 5
+Cy11IsPolled = 1
+Cy11NumConcurrentSymRequests = 512
+Cy11NumConcurrentAsymRequests = 64
+Cy11RingAsymTx = 2
+Cy11RingAsymRx = 3
+Cy11RingSymTxHi = 4
+Cy11RingSymRxHi = 5
+Cy11RingSymTxLo = 6
+Cy11RingSymRxLo = 7
+
+Cy12Name = "WIRELESS12"
+Cy12AcceleratorNumber = 0
+Cy12ExecutionEngine = 0
+Cy12BankNumber = 6
+Cy12IsPolled = 1
+Cy12NumConcurrentSymRequests = 512
+Cy12NumConcurrentAsymRequests = 64
+Cy12RingAsymTx = 2
+Cy12RingAsymRx = 3
+Cy12RingSymTxHi = 4
+Cy12RingSymRxHi = 5
+Cy12RingSymTxLo = 6
+Cy12RingSymRxLo = 7
+
+Cy13Name = "WIRELESS13"
+Cy13AcceleratorNumber = 0
+Cy13ExecutionEngine = 1
+Cy13BankNumber = 7
+Cy13IsPolled = 1
+Cy13NumConcurrentSymRequests = 512
+Cy13NumConcurrentAsymRequests = 64
+Cy13RingAsymTx = 2
+Cy13RingAsymRx = 3
+Cy13RingSymTxHi = 4
+Cy13RingSymRxHi = 5
+Cy13RingSymTxLo = 6
+Cy13RingSymRxLo = 7
+
+Cy14Name = "WIRELESS14"
+Cy14AcceleratorNumber = 1
+Cy14ExecutionEngine = 0
+Cy14BankNumber = 6
+Cy14IsPolled = 1
+Cy14NumConcurrentSymRequests = 512
+Cy14NumConcurrentAsymRequests = 64
+Cy14RingAsymTx = 2
+Cy14RingAsymRx = 3
+Cy14RingSymTxHi = 4
+Cy14RingSymRxHi = 5
+Cy14RingSymTxLo = 6
+Cy14RingSymRxLo = 7
+
+Cy15Name = "WIRELESS15"
+Cy15AcceleratorNumber = 1
+Cy15ExecutionEngine = 1
+Cy15BankNumber = 7
+Cy15IsPolled = 1
+Cy15NumConcurrentSymRequests = 512
+Cy15NumConcurrentAsymRequests = 64
+Cy15RingAsymTx = 2
+Cy15RingAsymRx = 3
+Cy15RingSymTxHi = 4
+Cy15RingSymRxHi = 5
+Cy15RingSymTxLo = 6
+Cy15RingSymRxLo = 7
+
+Cy16Name = "WIRELESS16"
+Cy16AcceleratorNumber = 0
+Cy16ExecutionEngine = 0
+Cy16BankNumber = 0
+Cy16IsPolled = 1
+Cy16NumConcurrentSymRequests = 512
+Cy16NumConcurrentAsymRequests = 64
+Cy16RingAsymTx = 10
+Cy16RingAsymRx = 11
+Cy16RingSymTxHi = 12
+Cy16RingSymRxHi = 13
+Cy16RingSymTxLo = 14
+Cy16RingSymRxLo = 15
+
+Cy17Name = "WIRELESS17"
+Cy17AcceleratorNumber = 0
+Cy17ExecutionEngine = 1
+Cy17BankNumber = 1
+Cy17IsPolled = 1
+Cy17NumConcurrentSymRequests = 512
+Cy17NumConcurrentAsymRequests = 64
+Cy17RingAsymTx = 10
+Cy17RingAsymRx = 11
+Cy17RingSymTxHi = 12
+Cy17RingSymRxHi = 13
+Cy17RingSymTxLo = 14
+Cy17RingSymRxLo = 15
+
+Cy18Name = "WIRELESS18"
+Cy18AcceleratorNumber = 1
+Cy18ExecutionEngine = 0
+Cy18BankNumber = 0
+Cy18IsPolled = 1
+Cy18NumConcurrentSymRequests = 512
+Cy18NumConcurrentAsymRequests = 64
+Cy18RingAsymTx = 10
+Cy18RingAsymRx = 11
+Cy18RingSymTxHi = 12
+Cy18RingSymRxHi = 13
+Cy18RingSymTxLo = 14
+Cy18RingSymRxLo = 15
+
+Cy19Name = "WIRELESS19"
+Cy19AcceleratorNumber = 1
+Cy19ExecutionEngine = 1
+Cy19BankNumber = 1
+Cy19IsPolled = 1
+Cy19NumConcurrentSymRequests = 512
+Cy19NumConcurrentAsymRequests = 64
+Cy19RingAsymTx = 10
+Cy19RingAsymRx = 11
+Cy19RingSymTxHi = 12
+Cy19RingSymRxHi = 13
+Cy19RingSymTxLo = 14
+Cy19RingSymRxLo = 15
+
+Cy20Name = "WIRELESS20"
+Cy20AcceleratorNumber = 0
+Cy20ExecutionEngine = 0
+Cy20BankNumber = 2
+Cy20IsPolled = 1
+Cy20NumConcurrentSymRequests = 512
+Cy20NumConcurrentAsymRequests = 64
+Cy20RingAsymTx = 10
+Cy20RingAsymRx = 11
+Cy20RingSymTxHi = 12
+Cy20RingSymRxHi = 13
+Cy20RingSymTxLo = 14
+Cy20RingSymRxLo = 15
+
+Cy21Name = "WIRELESS21"
+Cy21AcceleratorNumber = 0
+Cy21ExecutionEngine = 1
+Cy21BankNumber = 3
+Cy21IsPolled = 1
+Cy21NumConcurrentSymRequests = 512
+Cy21NumConcurrentAsymRequests = 64
+Cy21RingAsymTx = 10
+Cy21RingAsymRx = 11
+Cy21RingSymTxHi = 12
+Cy21RingSymRxHi = 13
+Cy21RingSymTxLo = 14
+Cy21RingSymRxLo = 15
+
+Cy22Name = "WIRELESS22"
+Cy22AcceleratorNumber = 1
+Cy22ExecutionEngine = 0
+Cy22BankNumber = 2
+Cy22IsPolled = 1
+Cy22NumConcurrentSymRequests = 512
+Cy22NumConcurrentAsymRequests = 64
+Cy22RingAsymTx = 10
+Cy22RingAsymRx = 11
+Cy22RingSymTxHi = 12
+Cy22RingSymRxHi = 13
+Cy22RingSymTxLo = 14
+Cy22RingSymRxLo = 15
+
+Cy23Name = "WIRELESS23"
+Cy23AcceleratorNumber = 1
+Cy23ExecutionEngine = 1
+Cy23BankNumber = 3
+Cy23IsPolled = 1
+Cy23NumConcurrentSymRequests = 512
+Cy23NumConcurrentAsymRequests = 64
+Cy23RingAsymTx = 10
+Cy23RingAsymRx = 11
+Cy23RingSymTxHi = 12
+Cy23RingSymRxHi = 13
+Cy23RingSymTxLo = 14
+Cy23RingSymRxLo = 15
+
+Cy24Name = "WIRELESS24"
+Cy24AcceleratorNumber = 0
+Cy24ExecutionEngine = 0
+Cy24BankNumber = 4
+Cy24IsPolled = 1
+Cy24NumConcurrentSymRequests = 512
+Cy24NumConcurrentAsymRequests = 64
+Cy24RingAsymTx = 10
+Cy24RingAsymRx = 11
+Cy24RingSymTxHi = 12
+Cy24RingSymRxHi = 13
+Cy24RingSymTxLo = 14
+Cy24RingSymRxLo = 15
+
+Cy25Name = "WIRELESS25"
+Cy25AcceleratorNumber = 0
+Cy25ExecutionEngine = 1
+Cy25BankNumber = 5
+Cy25IsPolled = 1
+Cy25NumConcurrentSymRequests = 512
+Cy25NumConcurrentAsymRequests = 64
+Cy25RingAsymTx = 10
+Cy25RingAsymRx = 11
+Cy25RingSymTxHi = 12
+Cy25RingSymRxHi = 13
+Cy25RingSymTxLo = 14
+Cy25RingSymRxLo = 15
+
+Cy26Name = "WIRELESS26"
+Cy26AcceleratorNumber = 1
+Cy26ExecutionEngine = 0
+Cy26BankNumber = 4
+Cy26IsPolled = 1
+Cy26NumConcurrentSymRequests = 512
+Cy26NumConcurrentAsymRequests = 64
+Cy26RingAsymTx = 10
+Cy26RingAsymRx = 11
+Cy26RingSymTxHi = 12
+Cy26RingSymRxHi = 13
+Cy26RingSymTxLo = 14
+Cy26RingSymRxLo = 15
+
+Cy27Name = "WIRELESS27"
+Cy27AcceleratorNumber = 1
+Cy27ExecutionEngine = 1
+Cy27BankNumber = 5
+Cy27IsPolled = 1
+Cy27NumConcurrentSymRequests = 512
+Cy27NumConcurrentAsymRequests = 64
+Cy27RingAsymTx = 10
+Cy27RingAsymRx = 11
+Cy27RingSymTxHi = 12
+Cy27RingSymRxHi = 13
+Cy27RingSymTxLo = 14
+Cy27RingSymRxLo = 15
+
+Cy28Name = "WIRELESS28"
+Cy28AcceleratorNumber = 0
+Cy28ExecutionEngine = 0
+Cy28BankNumber = 6
+Cy28IsPolled = 1
+Cy28NumConcurrentSymRequests = 512
+Cy28NumConcurrentAsymRequests = 64
+Cy28RingAsymTx = 10
+Cy28RingAsymRx = 11
+Cy28RingSymTxHi = 12
+Cy28RingSymRxHi = 13
+Cy28RingSymTxLo = 14
+Cy28RingSymRxLo = 15
+
+Cy29Name = "WIRELESS29"
+Cy29AcceleratorNumber = 0
+Cy29ExecutionEngine = 1
+Cy29BankNumber = 7
+Cy29IsPolled = 1
+Cy29NumConcurrentSymRequests = 512
+Cy29NumConcurrentAsymRequests = 64
+Cy29RingAsymTx = 10
+Cy29RingAsymRx = 11
+Cy29RingSymTxHi = 12
+Cy29RingSymRxHi = 13
+Cy29RingSymTxLo = 14
+Cy29RingSymRxLo = 15
+
+Cy30Name = "WIRELESS30"
+Cy30AcceleratorNumber = 1
+Cy30ExecutionEngine = 0
+Cy30BankNumber = 6
+Cy30IsPolled = 1
+Cy30NumConcurrentSymRequests = 512
+Cy30NumConcurrentAsymRequests = 64
+Cy30RingAsymTx = 10
+Cy30RingAsymRx = 11
+Cy30RingSymTxHi = 12
+Cy30RingSymRxHi = 13
+Cy30RingSymTxLo = 14
+Cy30RingSymRxLo = 15
+
+Cy31Name = "WIRELESS31"
+Cy31AcceleratorNumber = 1
+Cy31ExecutionEngine = 1
+Cy31BankNumber = 7
+Cy31IsPolled = 1
+Cy31NumConcurrentSymRequests = 512
+Cy31NumConcurrentAsymRequests = 64
+Cy31RingAsymTx = 10
+Cy31RingAsymRx = 11
+Cy31RingSymTxHi = 12
+Cy31RingSymRxHi = 13
+Cy31RingSymTxLo = 14
+Cy31RingSymRxLo = 15

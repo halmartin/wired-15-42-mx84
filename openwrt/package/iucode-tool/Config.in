@@ -1,0 +1,8 @@
+config BR2_PACKAGE_IUCODETOOL
+    prompt "iucode-tool.......................... Linux IUCODE TOOL"
+    tristate
+    default n if CONFIG_DEVEL
+    help
+      iucode-tool is a program to manipulate microcode update
+      collections for Intel i686 and X86-64 system processors, and
+      prepare them for use by the Linux kernel.

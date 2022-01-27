@@ -1,0 +1,4 @@
+./Makefile
+./config.h
+./quickassist/utilities/adf_ctl/adf_ctl
+./stamp-h1

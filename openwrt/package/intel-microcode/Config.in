@@ -1,0 +1,6 @@
+config BR2_PACKAGE_INTELMICROCODE
+    prompt "intel-microcode.......................... Intel x86 CPU microcode"
+    tristate
+    default n if CONFIG_DEVEL
+    help
+      This package contains microcode updates for Intel x86 cpus.

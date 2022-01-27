@@ -1,0 +1,8 @@
+*.ko
+*.o
+*.gcno
+*.cmd
+*.symvers
+icp_netkey/.tmp_versions
+icp_netkey/icp_qat_netkey.mod.c
+icp_netkey/modules.order

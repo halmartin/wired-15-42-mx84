@@ -1,0 +1,321 @@
+/******************************************************************************
+ *
+ *   BSD LICENSE
+ * 
+ *   Copyright(c) 2007-2018 Intel Corporation. All rights reserved.
+ *   All rights reserved.
+ * 
+ *   Redistribution and use in source and binary forms, with or without
+ *   modification, are permitted provided that the following conditions
+ *   are met:
+ * 
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in
+ *       the documentation and/or other materials provided with the
+ *       distribution.
+ *     * Neither the name of Intel Corporation nor the names of its
+ *       contributors may be used to endorse or promote products derived
+ *       from this software without specific prior written permission.
+ * 
+ *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ *   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ *   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ *   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ *  version: QAT1.7.L.4.6.0-00025
+ *
+ *****************************************************************************/
+
+===============================================================================
+
+
+July, 2016
+===============================================================================
+
+Reference
+=========
+
+
+ - Intel® Communications Chipset 89xx Series Software for Linux*
+   Getting Started Guide
+
+===============================================================================
+
+Overview
+=========
+
+
+Intel® QuickAssist Technology provides security and compression acceleration
+capabilities used to improve performance and efficiency across the data center.
+
+Previously existing build system has been replaced by Autotools solution
+in order to provide with the widely known and easy to use tool to build and
+install source packages.
+
+===============================================================================
+
+
+Compilation and installation
+
+===============================================================================
+
+1) QAT compilation requires following dependencies:
+
+	libraries:
+	- libboost	>= 1.14
+	- libudev	>= 1.47
+
+	tools:
+	- gcc		>= 4.4.7
+	- g++		>= 4.4.7
+	- pkg-config	>= 0.9.0
+
+===============================================================================
+
+2) Configuration process:
+
+	To setup the default build configuration - call:
+	./configure
+
+	Any other configuration setup can be found under
+	"configuration options section" or by calling:
+
+	./configure --help
+
+===============================================================================
+
+3) Compilation process:
+
+	After the package has been configured properly,
+	follow the steps below:
+
+	Build and install:
+	make
+	make install
+
+	Build and install sample code:
+	make samples
+	make samples-install
+
+	Uninstall and clean up:
+	make uninstall
+	make clean
+	make distclean
+
+ NOTE: If kernel module signing is required for the QAT out-of-tree drivers,
+       (e.g. if UEFI Secure Boot is enabled), one can incorporate this step
+       by setting the 'mod_sign_cmd' environment variable prior to invoking
+       the 'make install' command.
+
+       The mod_sign_cmd environment variable should be set to the path of the
+       required kernel headers sign-file program and include it's first three
+       command line arguments.
+       e.g.:
+
+       export mod_sign_cmd='<kernel header path>/scripts/sign-file sha256 /root/priv.key /root/pub.der'
+
+===============================================================================
+
+4) Configuration options
+
+        There is a common example of invoke and can be illustrated as follow:
+
+		./configure ICP_ANY_FLAG=path or
+		./configure --enable-something
+
+        If it is required to use more than one flag at once:
+
+                ./configure ICP_ANY_PATH=path ICP_ANY_NAME=name --enable-something
+
+Options are split into the two following sections:
+
+Build flags:
+	This set of flags has to be set (initial values are assigned by default)
+	in order to process the proper QAT build.
+
+	If a different setup if required - flags can be easily modified.
+
+	Warning.
+	Please keep in mind that any incorrect change might cause
+	compilation problems - in such case default configuration setup is
+	recommended to fix it.
+
+	ICP_ROOT
+		Path to the directory where acceleration software is extracted.
+		(QAT 1.7 package root directory)
+	
+		Type: path
+		Default value: `pwd`
+
+	ICP_BUILDSYSTEM_PATH
+		Path to build system folder located under
+		the quickassist directory.
+
+		Type: path
+		Default value: `pwd`/quickassist/build_system
+
+	ICP_BUILD_OUTPUT
+		Path to the output build directory where
+		executables/libraries will be placed.
+
+		Type: path
+		Default value: `pwd`/build
+
+	ICP_ENV_DIR
+		Path to the directory containing the environment build files.
+
+		Type: path
+		Default value: pwd`/quickassist/build_system/build_files/ env_files
+
+	ICP_TOOLS_TARGET
+		Software platform target (Set ‘accelcomp’ for Intel® Communications
+		Chipset Series Software platforms).
+
+		Type: name
+		Default value: accelcomp
+
+Features flags:
+	Enables or disables the additional features supported by QAT 1.7 package
+
+	--disable-option-checking
+		Ignores unrecognized configure options when run along with it.
+
+	--enable-icp-debug
+		Enables debugging.
+
+	--disable-param-check
+		Disables parameters checking in the top-level APIs
+		(Use for performance optimization).
+
+	--disable-stats
+		Disables statistic collection (Use for performance optimization).
+
+	--enable-icp-log-syslog
+		Enables debugging messages to be outputted to the
+		system log instead of standard output.
+
+	--enable-icp-nonblocking-partials-perform
+		Partial operations results are not being blocked.
+
+	--enable-icp-sriov
+		Enables Single-root I/O Virtualization in the QAT
+		driver (available options: host, guest).
+
+		Due to not common calling convention there is an example of
+		invoke possibility:
+
+		./configure --enable-icp-sriov=host or
+		./configure --enable-icp-sriov=guest
+
+	--enable-icp-trace
+		Enables tracing for the Cryptography API.
+
+	--enable-icp-dc-only
+		Enables driver supports only compression service
+		(Can optimize size of build objects).
+
+	--enable-icp-dc-sym-only
+		Enables driver to support Data Compression and
+		Symmetric Crypto services only.
+
+	--enable-icp-dc-return-counters-on-error
+		Enables updates of consumed/produced results in case
+		of error during compression or decompression
+		operations.
+
+	--disable-icp-inline
+		When defined, function inlining for functions that
+		cannot be inlined by the compiler is removed to
+		enable compilation of the driver for kernels build
+		without CONFIG_ARCH_SUPPORTS_OPTIMIZED_INLINING.
+
+	--enable-kpt
+		Enables KPT feature.
+
+	--enable-icp-hb-fail-sim
+		Enable Heartbeat Failure Simulation.
+
+	--enable-qat-coexistence
+		Enable driver co-existence with legacy 1.6 driver.
+
+	--disable-qat-lkcf
+		Disables QAT registration with Linux Kernel Crypto
+		Framework.
+
+	--disable-dc-strict-mode
+		Disables strict mode for data compression.
+
+	--enable-dc-error-simulation
+		Enables Data Compression Error Simulation.
+
+	--enable-kapi
+		Enables Intel(R) QuickAssist API in Kernel space.
+
+	--enable-icp-without-thread
+		Removes mutex and spin locks for single thread applications.
+
+	MAX_MR
+		Number of Miller Rabin rounds for prime operations. Setting this
+		to a smaller value reduces the memory usage required by the
+		driver.
+
+		Type: value
+		Default value: 50
+
+	KERNEL_SOURCE_ROOT
+		Path to kernel sources directory.
+
+		Type: path
+		Default value: /lib/modules/`uname –r`/build/
+
+===============================================================================
+
+5) Known Issues
+
+The current build system does not support dependency checking functionality
+which cause a call of clean during make.
+
+To avoid building the QAT package twice - during "make" and after
+during "make install" call. The workaroud is to call:
+
+	make install
+
+omitting "make".
+
+It is the same with samples codes.
+
+
+
+
+Legal/Disclaimers
+===================
+
+INFORMATION IN THIS DOCUMENT IS PROVIDED IN CONNECTION WITH INTEL(R) PRODUCTS.
+NO LICENSE, EXPRESS OR IMPLIED, BY ESTOPPEL OR OTHERWISE, TO ANY INTELLECTUAL
+PROPERTY RIGHTS IS GRANTED BY THIS DOCUMENT. EXCEPT AS PROVIDED IN INTEL'S 
+TERMS AND CONDITIONS OF SALE FOR SUCH PRODUCTS, INTEL ASSUMES NO LIABILITY 
+WHATSOEVER, AND INTEL DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTY, RELATING TO 
+SALE AND/OR USE OF INTEL PRODUCTS INCLUDING LIABILITY OR WARRANTIES RELATING 
+TO FITNESS FOR A PARTICULAR PURPOSE, MERCHANTABILITY, OR INFRINGEMENT OF ANY 
+PATENT, COPYRIGHT OR OTHER INTELLECTUAL PROPERTY RIGHT. Intel products are 
+not intended for use in medical, life saving, life sustaining, critical control
+ or safety systems, or in nuclear facility applications.
+
+Intel may make changes to specifications and product descriptions at any time,
+without notice.
+
+(C) Intel Corporation 2008  
+
+* Other names and brands may be claimed as the property of others.
+
+===============================================================================
+

@@ -1,0 +1,5 @@
+Package: intel-microcode
+Priority: optional
+Section: firmware
+Description: Intel x86 CPU microcode
+Depends: iucode-tool

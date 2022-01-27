@@ -1,0 +1,5 @@
+Package: iucode-tool
+Priority: optional
+Section: utils
+Description: Linux IUCODE Tool
+Depends:

@@ -1,0 +1,16 @@
+InstallerLog.txt
+*Module.symvers
+*.order
+*.o
+*.a
+*.cmd
+*.gcno
+*.tar.gz
+build
+.tmp_versions
+*#Makefile
+*#Makefile#
+*.tar.bz2
+*.ko
+*.mod.*
+*.tmp

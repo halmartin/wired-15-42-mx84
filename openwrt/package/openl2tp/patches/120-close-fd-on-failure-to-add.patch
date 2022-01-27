@@ -1,0 +1,26 @@
+From 1768370ba7d02477a274a9f20e2dac5566e46ac8 Mon Sep 17 00:00:00 2001
+From: Rucha Vaidya <rucha@meraki.com>
+Date: Wed, 22 Apr 2020 21:09:21 -0700
+Subject: [PATCH] close fd on failure to add
+
+Change-Id: I54f1db6011eeee69a88a52c85fdb8542ca05dc09
+---
+ l2tp_tunnel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/l2tp_tunnel.c b/l2tp_tunnel.c
+index 5c3974d64a9..eda56335929 100644
+--- a/l2tp_tunnel.c
++++ b/l2tp_tunnel.c
+@@ -2842,7 +2842,7 @@ int l2tp_tunnel_xprt_create(struct l2tp_peer *peer, struct l2tp_tunnel *tunnel,
+ 	result = usl_fd_add_fd(new_fd, l2tp_net_recv_unconn, tunnel);
+ 	if (result < 0) {
+ 		l2tp_log(LOG_ERR, "unable to register socket %d", new_fd);
+-		goto out;
++		goto err_close;
+ 	}
+ 
+ 	result = l2tp_xprt_tunnel_create(new_fd, tunnel->status.tunnel_id, &params, tunnel, &tunnel->xprt);
+-- 
+2.26.2
+

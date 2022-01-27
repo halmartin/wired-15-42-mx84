@@ -1,0 +1,187 @@
+#!/bin/bash
+#################################################################
+#
+# This file is provided under a dual BSD/GPLv2 license.  When using or 
+#   redistributing this file, you may do so under either license.
+# 
+#   GPL LICENSE SUMMARY
+# 
+#   Copyright(c) 2007-2013 Intel Corporation. All rights reserved.
+# 
+#   This program is free software; you can redistribute it and/or modify 
+#   it under the terms of version 2 of the GNU General Public License as
+#   published by the Free Software Foundation.
+# 
+#   This program is distributed in the hope that it will be useful, but 
+#   WITHOUT ANY WARRANTY; without even the implied warranty of 
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+#   General Public License for more details.
+# 
+#   You should have received a copy of the GNU General Public License 
+#   along with this program; if not, write to the Free Software 
+#   Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
+#   The full GNU General Public License is included in this distribution 
+#   in the file called LICENSE.GPL.
+# 
+#   Contact Information:
+#   Intel Corporation
+# 
+#   BSD LICENSE 
+# 
+#   Copyright(c) 2007-2013 Intel Corporation. All rights reserved.
+#   All rights reserved.
+# 
+#   Redistribution and use in source and binary forms, with or without 
+#   modification, are permitted provided that the following conditions 
+#   are met:
+# 
+#     * Redistributions of source code must retain the above copyright 
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright 
+#       notice, this list of conditions and the following disclaimer in 
+#       the documentation and/or other materials provided with the 
+#       distribution.
+#     * Neither the name of Intel Corporation nor the names of its 
+#       contributors may be used to endorse or promote products derived 
+#       from this software without specific prior written permission.
+# 
+#   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+#   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+#   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+#   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+#   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+#   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
+#   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+#   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+#   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+#  version: QAT1.6.L.2.6.0-65
+#
+#################################################################
+# qat_service          Start/Stop the Intel QAT.
+#
+# chkconfig: 345 99 99
+# description: modprobe the QAT qat_1_6_mux.ko & qat_1_5_mux.ko, 
+# which loads dependant modules, before calling the user space \
+# utility to pass configuration parameters
+
+MODULE_DIR="/lib/modules/`\uname -r`/kernel/drivers"
+
+usage() {
+echo
+echo --------------------------------------------------------
+echo USAGE:
+echo --------------------------------------------------------
+echo "#  $0 start||stop||status||restart||shutdown"
+echo --------------------------------------------------------
+echo " Note: If there is more devices in the system"
+echo " you can start, stop or restart separate device by "
+echo " passing the dev to be restarted or stopped as a"
+echo " parameter for instance: "
+echo " $0 stop icp_dev<N>"
+echo " where N is device number."
+echo " To see all devices in the system use:"
+echo " $0 status"
+echo --------------------------------------------------------
+exit 1
+}
+
+case $1 in
+  Start|start)
+    # First check if the modules are already installed
+    # install them as necessary and if they are LKMs
+    # and not built-in kernel modules
+    if [ `lsmod | grep -c "sha512"` == 0 ]; then
+         if [ `cat /proc/kallsyms |grep -c sha512_generic` == 0 ]; then
+             `modprobe sha512`
+         fi
+    fi
+
+    if [ `lsmod | grep -c "sha256"` == 0 ]; then
+         if [ `cat /proc/kallsyms |grep -c sha256_generic` == 0 ]; then
+             `modprobe sha256`
+         fi
+    fi
+
+    if [ `lsmod | grep -o ^qat_dh895xcc` ]; then
+         rmmod -f qat_dh895xcc
+    fi
+
+    if [ `lsmod | grep -o ^intel_qat` ]; then
+         rmmod -f intel_qat
+    fi
+
+
+    # First check if the modules are already installed, if
+    # so remove them as modprobe does not report such cases
+    dh895DeviceNumber=`lspci -vnd 8086: | egrep -c "0435|0443"`
+
+    if [ "$dh895DeviceNumber" != "0" ]; then
+        EXIST=`modprobe -q --first-time qat_1_6_mux`
+        STRING="FATAL: Module qat_1_6_mux already in kernel"
+        if [ "$EXIST" != "$STRING" ]; then
+            modprobe qat_1_6_mux || exit -1
+        fi
+    fi
+
+    dh89xDeviceNumber=`lspci -vnd 8086: | egrep -c "0434|0442"`
+    c2xxxDeviceNumber=`lspci -vnd 8086: | grep -c "1f18"`
+    qat_1_5_mux_installed=`ls $MODULE_DIR/qat_1_5_mux.ko 2>/dev/null | wc -l`
+    
+    if [ $qat_1_5_mux_installed = "1" ] ; then 
+    	if [ "$dh89xDeviceNumber" != "0" ] || [ "$c2xxxDeviceNumber" != "0" ] ; then
+        	EXIST=`modprobe -q --first-time qat_1_5_mux`
+        	STRING="FATAL: Module qat_1_5_mux already in kernel"
+        	if [ "$EXIST" != "$STRING" ]; then
+            		modprobe qat_1_5_mux || exit -1
+       		fi
+    	fi
+    fi
+    /etc/init.d/adf_ctl $2 up	
+            ;;
+
+ Shutdown|shutdown)
+   if [ -e /etc/init.d/adf_ctl ]; then
+      /etc/init.d/adf_ctl down
+   fi
+   modprobe -q -r qat_1_5_mux 
+   modprobe -q -r qat_1_6_mux 
+   if [ -n "`lsmod | grep qat_1_5_mux_vf`" ]; then
+       rmmod -f qat_1_5_mux_vf
+   fi
+   if [ -n "`lsmod | grep qat_1_6_mux_vf`" ]; then
+       rmmod -f qat_1_6_mux_vf
+   fi
+   if [ -n "`lsmod | grep qat_mux`" ]; then
+      rmmod -f qat_mux
+   fi
+
+            ;;
+
+ Stop|stop)
+       /etc/init.d/adf_ctl $2 down
+            ;;
+
+ Restart|restart)
+       /etc/init.d/adf_ctl $2 down && /etc/init.d/adf_ctl $2 up
+            ;;
+
+ Status|status)
+       /etc/init.d/adf_ctl status
+    if [ "$?" -ne 0 ]
+    then
+        echo "No devices found. Please start the driver using:"
+        echo "$0 start"
+    fi
+            ;;
+
+ *)
+      usage
+            ;;
+
+esac
+exit 0
+

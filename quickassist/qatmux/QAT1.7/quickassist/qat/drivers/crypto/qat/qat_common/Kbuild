@@ -1,0 +1,30 @@
+# Kbuild file for out-of-tree driver only !!!DO NOT PUSH UPSTREAM!!!
+include $(src)/Makefile
+
+intel_qat-objs += ../../../../compat/qat_compat.o
+
+ifneq ($(QAT_NO_LKCF),y)
+intel_qat-objs += qat_algs_old.o \
+	qat_asym_algs_old.o \
+	qat_rsapubkey-asn1.o \
+	qat_rsaprivkey-asn1.o
+endif
+
+intel_qat-$(QAT_UIO) += \
+	adf_uio.o \
+	adf_uio_control.o \
+	adf_uio_cleanup.o \
+	adf_dev_processes.o \
+	qdm.o \
+	adf_cfg_device.o \
+	adf_cfg_bundle.o \
+	adf_cfg_instance.o \
+	adf_cfg_section.o
+
+ccflags-$(QAT_UIO) += -DQAT_RSA_SUPPORT=y -DQAT_AEAD_OLD_SUPPORT=y
+ccflags-$(ICP_HB_FAIL_SIM) += -DQAT_HB_FAIL_SIM=y
+ifdef KPT
+intel_qat-$(QAT_UIO) += adf_mei_kpt.o
+endif
+ccflags-$(QAT_PKE_MAX_SZ_SIGN) += -DQAT_PKE_MAX_SZ_SIGN=""
+ccflags-$(QAT_PKE_MAX_SZ_UNSIGN) += -DQAT_PKE_MAX_SZ_SIGN=unsigned
